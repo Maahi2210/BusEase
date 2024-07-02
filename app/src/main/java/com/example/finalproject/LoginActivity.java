@@ -52,14 +52,14 @@ public class LoginActivity extends AppCompatActivity {
         forgetpass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this,ForgotpasswordActivity.class);
-            startActivity(intent);
-            finish();
-        }
+                Intent intent = new Intent(LoginActivity.this,ForgotPasswordActivity.class);
+                startActivity(intent);
+                finish();
+            }
         });
 
-    }
 
+    }
 
 
     public void checkuser(){
@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
                                 .getValue(String.class);
                         String emailDB =snapshot.child(usernameLogin).child("email")
                                 .getValue(String.class);
-                        Intent intent = new Intent(LoginActivity.this,SearchActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, SearchActivity.class);
                         intent.putExtra("email",emailDB);
                         intent.putExtra("password",passDBl);
                         intent.putExtra("username",usernameDB);

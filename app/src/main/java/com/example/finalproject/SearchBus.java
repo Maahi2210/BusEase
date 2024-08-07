@@ -11,19 +11,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchBus extends AppCompatActivity {
     Button btn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_search);
+        setContentView(R.layout.activity_search_bus);
 
         btn = findViewById(R.id.search);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(SearchActivity.this,SelectBusActivity.class);
+                Intent intent = new Intent(SearchBus.this,SelectBusActivity.class);
                 startActivity(intent);
                 finish();
             }

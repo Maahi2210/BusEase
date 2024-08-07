@@ -11,96 +11,86 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText loginusername,loginpass;
-    Button loginbtn,forgetpass;
-    TextView singuplink;
+    private EditText loginUsername, loginPass;
+    private Button loginBtn, forgetPass;
+    private TextView signUpLink;
+    private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        loginusername = findViewById(R.id.usernamelogin);
-        loginpass = findViewById(R.id.passwordlogin);
-        loginbtn = findViewById(R.id.login);
-        forgetpass = findViewById(R.id.forgetpass);
-        singuplink = findViewById(R.id.signuplink);
+        loginUsername = findViewById(R.id.usernamelogin);
+        loginPass = findViewById(R.id.passwordlogin);
+        loginBtn = findViewById(R.id.login);
+        forgetPass = findViewById(R.id.forgetpass);
+        signUpLink = findViewById(R.id.signuplink);
 
-        singuplink.setOnClickListener(new View.OnClickListener() {
+
+        mAuth = FirebaseAuth.getInstance();
+
+        signUpLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(LoginActivity.this,SignUpActivity.class);
-                startActivity(intent);
+                startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
                 finish();
             }
         });
 
-        loginbtn.setOnClickListener(new View.OnClickListener() {
+        loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                checkuser();
+                checkUser();
             }
         });
-        forgetpass.setOnClickListener(new View.OnClickListener() {
+
+        forgetPass.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this,ForgotPasswordActivity.class);
-                startActivity(intent);
+            public void onClick(View view) {
+                startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class));
                 finish();
             }
         });
-
-
     }
 
+    private void checkUser() {
+        String email = loginUsername.getText().toString().trim();
+        String password = loginPass.getText().toString().trim();
 
-    public void checkuser(){
-        String usernameLogin = loginusername.getText().toString().trim();
-        String passLogin = loginpass.getText().toString().trim();
-        DatabaseReference reference = FirebaseDatabase.getInstance()
-                .getReference("users");
-        Query checkuserData = reference.orderByChild("username")
-                .equalTo(usernameLogin);
-        checkuserData.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()){
-                    String passDB = snapshot.child(usernameLogin).child("password")
-                            .getValue(String.class);
-                    if (passDB.equals(passLogin)){
-                        String usernameDB = snapshot.child(usernameLogin).child("username")
-                                .getValue(String.class);
-                        String passDBl = snapshot.child(usernameLogin).child("password")
-                                .getValue(String.class);
-                        String emailDB =snapshot.child(usernameLogin).child("email")
-                                .getValue(String.class);
-                        Intent intent = new Intent(LoginActivity.this, SearchActivity.class);
-                        intent.putExtra("email",emailDB);
-                        intent.putExtra("password",passDBl);
-                        intent.putExtra("username",usernameDB);
-                        startActivity(intent);
-                        finish();
-                    }else{
-                        Toast.makeText(LoginActivity.this, "Password incorrect", Toast.LENGTH_SHORT).show();
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Please enter both email and password", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            if (user != null) {
+                                Intent intent = new Intent(LoginActivity.this, SearchBus.class);
+                                intent.putExtra("email", user.getEmail());
+                                intent.putExtra("username", user.getDisplayName()); // Ensure you set the display name during signup
+                                startActivity(intent);
+                                finish();
+                            }
+                        } else {
+
+                            Toast.makeText(LoginActivity.this, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }else{
-                    Toast.makeText(LoginActivity.this, "User not found", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+                });
     }
-
 }

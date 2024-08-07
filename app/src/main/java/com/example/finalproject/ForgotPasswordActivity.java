@@ -16,7 +16,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
      EditText Email;
      Button ResetPassword;
      FirebaseAuth mAuth;
-    Button Back;
+     Button Back;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +50,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 finish();
             }
         });
-
     }
-
     private void resetPassword(String email) {
         mAuth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {

@@ -2,6 +2,7 @@ package com.example.finalproject;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,51 +14,57 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 
-     EditText Email;
-     Button ResetPassword;
-     FirebaseAuth mAuth;
-     Button Back;
+    private static final String TAG = "ForgotPasswordActivity";
+    private EditText emailEditText;
+    private Button resetPasswordButton;
+    private FirebaseAuth mAuth;
+    private Button backButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
 
-        Email = findViewById(R.id.email);
-        ResetPassword = findViewById(R.id.resetpassword);
+        emailEditText = findViewById(R.id.email);
+        resetPasswordButton = findViewById(R.id.resetpassword);
         mAuth = FirebaseAuth.getInstance();
-        Back = findViewById(R.id.back);
-        ResetPassword.setOnClickListener(new View.OnClickListener() {
+        backButton = findViewById(R.id.back);
+
+        resetPasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = Email.getText().toString().trim();
+                String email = emailEditText.getText().toString().trim();
 
                 if (email.isEmpty()) {
-                    Email.setError("Email is required");
-                    Email.requestFocus();
+                    emailEditText.setError("Email is required");
+                    emailEditText.requestFocus();
                     return;
                 }
 
                 resetPassword(email);
             }
         });
-        Back.setOnClickListener(new View.OnClickListener() {
+
+        backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                Intent intent = new Intent(ForgotPasswordActivity.this,LoginActivity.class);
+                Intent intent = new Intent(ForgotPasswordActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
             }
         });
     }
+
     private void resetPassword(String email) {
-        mAuth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(ForgotPasswordActivity.this, "Check your email", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(ForgotPasswordActivity.this, "Failed reset email", Toast.LENGTH_SHORT).show();
-            }
-        });
+        mAuth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Password reset email sent.");
+                        Toast.makeText(ForgotPasswordActivity.this, "Check your email for the reset link", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.e(TAG, "Password reset email failed.", task.getException());
+                        Toast.makeText(ForgotPasswordActivity.this, "Failed to send reset email. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }

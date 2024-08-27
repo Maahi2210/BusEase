@@ -34,8 +34,6 @@ public class SignUpActivity extends AppCompatActivity {
         emailEditText = findViewById(R.id.email);
         loginLinkTextView = findViewById(R.id.loginlink);
         signUpButton = findViewById(R.id.signup);
-
-        // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
         loginLinkTextView.setOnClickListener(new View.OnClickListener() {
@@ -58,22 +56,18 @@ public class SignUpActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Register the user with Firebase Authentication
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-                                    // Sign-up successful
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     if (user != null) {
-                                        // Optionally, store additional user info in your database
                                         Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
                                         startActivity(intent);
                                         finish();
                                     }
                                 } else {
-                                    // If sign-up fails
                                     Toast.makeText(SignUpActivity.this, "Signup failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             }

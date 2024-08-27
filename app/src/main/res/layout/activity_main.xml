@@ -14,7 +14,7 @@
         android:layout_height="753dp"
         android:layout_margin="40dp"
         android:background="@color/white"
-        android:src="@drawable/buss" />
+        android:src="@drawable/atmosphere" />
 
 
 
